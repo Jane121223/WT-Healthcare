@@ -49,13 +49,23 @@ function MainApp({ user, onLogout }) {
             setPatientName('');
             setDrugName('');
             setDosage('');
+        })
+        .catch((err) => {
+            // Handle server-side validation errors
+            if (err.response && err.response.data && err.response.data.status) {
+                setMessage(err.response.data.status);
+            } else {
+                // Handle other errors
+                setMessage("An unexpected error occurred.");
+                console.error(err);
+            }
         });
     };
 
     // Function to update an existing prescription
     const updatePrescription = (event) => {
         event.preventDefault();
-        axios.post("http://localhost:7000/api/updatePrescription", {
+        axios.post("http://localhost:7000/api/updatePrescription", { // This endpoint doesn't have validation yet, but it's good practice to add error handling
             id: editingId,
             patientName: patientName,
             drugName: drugName,
@@ -66,6 +76,16 @@ function MainApp({ user, onLogout }) {
             setMessage(res.data.status);
             cancelEditing(); // Clear form and reset state
             loadPrescriptions(); // Refresh the table
+        })
+        .catch((err) => {
+            // Handle server-side validation errors
+            if (err.response && err.response.data && err.response.data.status) {
+                setMessage(err.response.data.status);
+            } else {
+                // Handle other errors
+                setMessage("An unexpected error occurred during update.");
+                console.error(err);
+            }
         });
     };
 
@@ -153,7 +173,7 @@ function MainApp({ user, onLogout }) {
                             </button>
                         )}
                     </form>
-                    <div className="text-success mt-4 fs-4">
+                    <div className="text-danger mt-4 fs-4">
                         {message && <span>{message}</span>}
                     </div>
                     <div className="mt-5">
